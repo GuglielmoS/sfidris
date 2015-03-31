@@ -1,10 +1,5 @@
 module Basics
 
-%hide Prelude.Bool.Bool
-%hide Prelude.Nat.Nat
-
-%default total
-
 data Day = Monday
          | Tuesday
          | Wednesday
@@ -27,12 +22,12 @@ testNextWeekDay = Refl
 
 -- booleans
 
-data Bool : Type where
-  True : Bool
-  False : Bool
+-- data Bool : Type where
+--   True : Bool
+--   False : Bool
 
 -- alernatively
--- data Bool = True | False
+--   data Bool = True | False
 
 negb : Bool -> Bool
 negb True = False
@@ -94,94 +89,97 @@ andb3OkWithTFT = Refl
 andb3OkWithTTF : andb3 True True False = False
 andb3OkWithTTF = Refl
 
-data Nat : Type where
-  O : Nat         -- zero
-  S : Nat -> Nat  -- successor
+namespace Playground1
+  data Nat' : Type where
+    O : Nat'         -- zero
+    S' : Nat' -> Nat'  -- successor
 
 -- alterntively
--- data Nat = O | S Nat 
+-- data Nat' = O | S Nat' 
 
-pred : Nat -> Nat
-pred O = O
-pred (S x) = x
+  pred : Nat' -> Nat'
+  pred O = O
+  pred (S' x) = x
 
 minusTwo : Nat -> Nat
-minusTwo O = O
-minusTwo (S O) = O
+minusTwo Z = Z
+minusTwo (S Z) = Z
 minusTwo (S (S x)) = x
 
 evenb : Nat -> Bool
-evenb O = True
-evenb (S O) = False
+evenb Z = True
+evenb (S Z) = False
 evenb (S (S x)) = evenb x
 
 oddb : Nat -> Bool
 oddb = negb . evenb
 
-testOddb1 : oddb (S O) = True
-testOddb1 = Refl
+testZddb1 : oddb (S Z) = True
+testZddb1 = Refl
 
-testOddb2 : oddb (S (S (S (S O)))) = False
-testOddb2 = Refl
+testZddb2 : oddb (S (S (S (S Z)))) = False
+testZddb2 = Refl
 
-plus : Nat -> Nat -> Nat
-plus O      m = m
-plus (S n) m = S (plus n m)
+namespace Playground2
+  plus' : Nat -> Nat -> Nat
+  plus' Z     m = m
+  plus' (S n) m = S (plus' n m)
 
-mult : Nat -> Nat -> Nat
-mult O m = O 
-mult (S n) m = plus m (mult n m) 
+  mult' : Nat -> Nat -> Nat
+  mult' Z m = Z 
+  mult' (S n) m = plus' m (mult' n m) 
 
-testMult1 : mult (S (S (S O))) (S (S (S O))) = (S (S (S (S (S (S (S (S (S O))))))))) 
-testMult1 = Refl
+  testMult1 : mult' (S (S (S Z))) (S (S (S Z))) = (S (S (S (S (S (S (S (S (S Z))))))))) 
+  testMult1 = Refl
 
-minus : Nat -> Nat -> Nat
-minus O _ = O
-minus n@(S _) O = n
-minus (S n) (S m) = minus n m
+  minus' : Nat -> Nat -> Nat
+  minus' Z _ = Z
+  minus' n@(S _) Z = n
+  minus' (S n) (S m) = minus' n m
+
 
 exp : Nat -> Nat -> Nat
-exp base O = S O
+exp base Z = S Z
 exp base (S p) = mult base (exp base p)
 
--- Exercise FACTORIAL
+-- Exercise FACTZRIAL
 
 factorial : Nat -> Nat
-factorial O = S O
+factorial Z = S Z
 factorial n@(S n') = mult n (factorial n')
 
-testFactorial1 : factorial (S (S (S O))) = S (S (S (S (S (S O)))))
+testFactorial1 : factorial (S (S (S Z))) = S (S (S (S (S (S Z)))))
 testFactorial1 = Refl
 
 ten : Nat
-ten = S (S (S (S (S (S (S (S (S (S O)))))))))
+ten = S (S (S (S (S (S (S (S (S (S Z)))))))))
 
 twelve : Nat
-twelve = plus ten (S (S O))
+twelve = plus ten (S (S Z))
 
-testFactorial2 : factorial (S (S (S (S (S O))))) = mult ten twelve 
+testFactorial2 : factorial (S (S (S (S (S Z))))) = mult ten twelve 
 testFactorial2 = Refl
 
 -- Exercise End
 
 beqNat : Nat -> Nat -> Bool
-beqNat O O = True
-beqNat O (S _) = False
-beqNat (S n) O = False
+beqNat Z Z = True
+beqNat Z (S _) = False
+beqNat (S n) Z = False
 beqNat (S n) (S m) = beqNat n m 
 
 bleNat : Nat -> Nat -> Bool
-bleNat O _ = True
-bleNat (S n) O = False 
+bleNat Z _ = True
+bleNat (S n) Z = False 
 bleNat (S n) (S m) = bleNat n m
 
-testBleNat1 : bleNat (S (S O)) (S (S O)) = True
+testBleNat1 : bleNat (S (S Z)) (S (S Z)) = True
 testBleNat1 = Refl
 
-testBleNat2 : bleNat (S (S O)) (S (S (S (S O)))) = True
+testBleNat2 : bleNat (S (S Z)) (S (S (S (S Z)))) = True
 testBleNat2 = Refl
 
-testBleNat3 : bleNat (S (S (S (S O)))) (S (S O)) = False
+testBleNat3 : bleNat (S (S (S (S Z)))) (S (S Z)) = False
 testBleNat3 = Refl
 
 -- Exercise BLT_NAT
@@ -189,24 +187,24 @@ testBleNat3 = Refl
 bltNat : Nat -> Nat -> Bool
 bltNat n m = andb (bleNat n m) (negb $ beqNat n m)
 
-testBltNat1 : bltNat (S (S O)) (S (S O)) = False
+testBltNat1 : bltNat (S (S Z)) (S (S Z)) = False
 testBltNat1 = Refl
 
-testBltNat2 : bltNat (S (S O)) (S (S (S (S O)))) = True
+testBltNat2 : bltNat (S (S Z)) (S (S (S (S Z)))) = True
 testBltNat2 = Refl
 
-testBltNat3 : bltNat (S (S (S (S O)))) (S (S O)) = False
+testBltNat3 : bltNat (S (S (S (S Z)))) (S (S Z)) = False
 testBltNat3 = Refl
 
 -- End Exercise
 
-plusZeroLeft : plus O n = n
+plusZeroLeft : plus Z n = n
 plusZeroLeft = Refl
 
-plusOneLeft : plus (S O) n = S n
-plusOneLeft = Refl
+plusZneLeft : plus (S Z) n = S n
+plusZneLeft = Refl
 
-multZeroLeft : mult O n = O
+multZeroLeft : mult Z n = Z
 multZeroLeft = Refl
 
 plusIdExample : n = m -> n + m = m + m
@@ -219,29 +217,29 @@ plusIdExercise nEQm mEQo = rewrite nEQm in rewrite mEQo in Refl
 
 -- Exercise End
 
-multZeroPlus : mult (plus O n) m = mult n m
+multZeroPlus : mult (plus Z n) m = mult n m
 multZeroPlus = Refl
 
 -- Exercise MUTL_S_1
 
-multSuccOne : m = S n -> mult m (plus (S O) n) = mult m m
-multSuccOne mEQSN = rewrite mEQSN in Refl
+multSuccZne : m = S n -> mult m (plus (S Z) n) = mult m m
+multSuccZne mEQSN = rewrite mEQSN in Refl
 
 -- Exercise End
 
-plusOneNeqZero : (n : Nat) -> beqNat (plus n (S O)) O = False
-plusOneNeqZero O = Refl
-plusOneNeqZero (S _) = Refl
+plusZneNeqZero : (n : Nat) -> beqNat (plus n (S Z)) Z = False
+plusZneNeqZero Z = Refl
+plusZneNeqZero (S _) = Refl
 
 negbInvolutive : (b : Bool) -> negb (negb b) = b
 negbInvolutive True = Refl
 negbInvolutive False = Refl
 
--- Exercise Zero_nbeq_PlusOne
+-- Exercise Zero_nbeq_PlusZne
 
-zeroNbeqPlusOne : (n : Nat) -> beqNat O (plus n (S O)) = False
-zeroNbeqPlusOne O = Refl
-zeroNbeqPlusOne (S _) = Refl
+zeroNbeqPlusZne : (n : Nat) -> beqNat Z (plus n (S Z)) = False
+zeroNbeqPlusZne Z = Refl
+zeroNbeqPlusZne (S _) = Refl
 
 -- Exercise End
 
@@ -251,16 +249,21 @@ identityFnAppliedTwice :
   (f : Bool -> Bool) -> ((x : Bool) -> f x = x) -> ((b : Bool) -> f (f b) = b)
 identityFnAppliedTwice f fxEQx b = rewrite fxEQx b in rewrite fxEQx b in Refl
 
---negationFnAppliedTwice :
---  (f : Bool -> Bool) -> ((x : Bool) -> f x = negb x) -> ((b : Bool) -> f (f b) = b)
--- TODO
+negationFnAppliedTwice :
+  (f : Bool -> Bool) -> ((x : Bool) -> f x = negb x) -> ((b : Bool) -> f (f b) = b)
+negationFnAppliedTwice f fxIsNegbx b = rewrite fxIsNegbx b in 
+                                       rewrite fxIsNegbx (negb b) in 
+                                       negbInvolutive b 
 
 -- Exercise End
 
--- Exercise ANDB_EQ_ORB
+-- Exercise ANDB_EQ_ZRB
 
---andbEQorb : (b : Bool) -> (c : Bool) -> andb b c = orb b c -> b = c
--- TODO
+andbEQorb : (b : Bool) -> (c : Bool) -> andb b c = orb b c -> b = c
+andbEQorb False False _ = Refl
+andbEQorb False True contra = contra
+andbEQorb True False contra = ?todo
+andbEQorb True True _ = Refl
 
 -- Exercise End
 
@@ -277,22 +280,21 @@ incr (TwiceBin x) = OneMoreThanTwice x
 incr (OneMoreThanTwice x) = TwiceBin (incr x)
 
 binToNat : Bin -> Nat
-binToNat Zero = O 
-binToNat (TwiceBin x) = mult (S (S O)) $ binToNat x 
-binToNat (OneMoreThanTwice x) = plus (S O) (mult (S (S O)) (binToNat x))
+binToNat Zero = Z 
+binToNat (TwiceBin x) = mult (S (S Z)) $ binToNat x 
+binToNat (OneMoreThanTwice x) = plus (S Z) (mult (S (S Z)) (binToNat x))
 
-testBinIncr1 : binToNat (incr Zero) = S O
+testBinIncr1 : binToNat (incr Zero) = S Z
 testBinIncr1 = Refl
 
-testBinIncr2 : binToNat (incr $ TwiceBin Zero) = S O
+testBinIncr2 : binToNat (incr $ TwiceBin Zero) = S Z
 testBinIncr2 = Refl
 
-testBinIncr3 : binToNat (incr $ OneMoreThanTwice Zero) = S (S O)
+testBinIncr3 : binToNat (incr $ OneMoreThanTwice Zero) = S (S Z)
 testBinIncr3 = Refl
 
-testBinIncr4 : (n : Bin) -> binToNat (incr n) = plus (S O) (binToNat n)
+testBinIncr4 : (n : Bin) -> binToNat (incr n) = plus (S Z) (binToNat n)
 testBinIncr4 Zero = Refl
 testBinIncr4 (TwiceBin x) = Refl
 testBinIncr4 (OneMoreThanTwice x) = ?testBinIncr4_rhs_4
--- TODO
 
