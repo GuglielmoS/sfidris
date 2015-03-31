@@ -60,3 +60,42 @@ doublePlus (S k) = rewrite sym $ plusN_Sm k k in
                            cong {f=S} $ cong {f=S} $ doublePlus k 
 
 -- Exercise End
+
+-- More Exercises
+
+bleNatRefl : (n : Nat) -> True = bleNat n n
+bleNatRefl Z = Refl
+bleNatRefl (S k) = bleNatRefl k 
+
+zeroNBeqS : (n : Nat) -> beqNat 0 (S n) = False 
+zeroNBeqS n = Refl
+
+andbFalseRigth : (b : Bool) -> andb b False = False
+andbFalseRigth False = Refl
+andbFalseRigth True = Refl
+
+plusBleCompatLeft : (n, m, p : Nat) -> bleNat n m = True -> bleNat (p + n) (p + m) = True
+plusBleCompatLeft n m Z nEQm = nEQm
+plusBleCompatLeft n m (S k) nEQm = rewrite plusBleCompatLeft n m k nEQm in Refl
+
+succNotBeqZero : beqNat (S n) 0 = False
+succNotBeqZero = Refl
+
+multOneLeft : (n : Nat) -> 1 * n = n
+multOneLeft = plusZeroRight 
+
+all3Spec : (b, c : Bool) -> orb (andb b c) (orb (negb b) (negb c)) = True 
+all3Spec False c = Refl
+-- tertium non datur
+all3Spec True False = Refl
+all3Spec True True = Refl
+
+-- Exercises End
+
+-- Exercise BeqNatRefl
+
+beqNatRefl : (n : Nat) -> True = beqNat n n
+beqNatRefl Z = Refl
+beqNatRefl (S k) = beqNatRefl k 
+
+-- Exercise End
