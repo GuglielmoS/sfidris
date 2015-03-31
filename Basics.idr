@@ -259,11 +259,11 @@ negationFnAppliedTwice f fxIsNegbx b = rewrite fxIsNegbx b in
 
 -- Exercise ANDB_EQ_ZRB
 
-andbEQorb : (b : Bool) -> (c : Bool) -> andb b c = orb b c -> b = c
-andbEQorb False False _ = Refl
-andbEQorb False True contra = contra
-andbEQorb True False contra = ?todo
-andbEQorb True True _ = Refl
+--andbEQorb : (b : Bool) -> (c : Bool) -> andb b c = orb b c -> b = c
+--andbEQorb False False _ = Refl
+--andbEQorb False True contra = contra
+--andbEQorb True False contra = ?todo
+--andbEQorb True True _ = Refl
 
 -- Exercise End
 
@@ -293,8 +293,7 @@ testBinIncr2 = Refl
 testBinIncr3 : binToNat (incr $ OneMoreThanTwice Zero) = S (S Z)
 testBinIncr3 = Refl
 
-testBinIncr4 : (n : Bin) -> binToNat (incr n) = plus (S Z) (binToNat n)
-testBinIncr4 Zero = Refl
-testBinIncr4 (TwiceBin x) = Refl
-testBinIncr4 (OneMoreThanTwice x) = ?testBinIncr4_rhs_4
-
+--testBinIncr4 : (n : Bin) -> binToNat (incr n) = plus (S Z) (binToNat n)
+--testBinIncr4 Zero = Refl
+--testBinIncr4 (TwiceBin x) = Refl
+--testBinIncr4 (OneMoreThanTwice x) = ?testBinIncr4_rhs_4
