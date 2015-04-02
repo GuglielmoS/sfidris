@@ -86,7 +86,6 @@ multOneLeft = plusZeroRight
 
 all3Spec : (b, c : Bool) -> orb (andb b c) (orb (negb b) (negb c)) = True 
 all3Spec False c = Refl
--- tertium non datur
 all3Spec True False = Refl
 all3Spec True True = Refl
 
