@@ -5,7 +5,6 @@ import Induction
 
 -- Conjunction
 
-%elim
 data And : Type -> Type -> Type where
   conj : {P,Q : Type} -> P -> Q -> And P Q
 
@@ -73,5 +72,24 @@ orbFalseElim True True prf = conj prf prf
 -- Falsehood
 
 exFalsoQuodlibet : {P : Type} -> Void -> P
-exFalsoQuodlibet x = ?exFalsoQuodlibet_rhs -- TODO
+exFalsoQuodlibet = void
 
+syntax "neg" [P] = P -> Void 
+
+notFalse : neg Void
+notFalse false = false
+
+contradictionImpliesAnything : (P, Q : Type) -> (P /\ (neg P)) -> Q
+contradictionImpliesAnything P Q (conj p notP) = exFalsoQuodlibet (notP p)
+
+-- Inequality
+
+notFalseThenTrue : (b : Bool) -> (neg (b = False)) -> b = True 
+notFalseThenTrue False prf = exFalsoQuodlibet (prf Refl)
+notFalseThenTrue True _ = Refl
+
+falseBeqNat : (n, m : Nat) -> (neg (n = m)) -> beqNat n m = False
+falseBeqNat Z      Z      prf = exFalsoQuodlibet (prf Refl)
+falseBeqNat Z      (S _)  _   = Refl
+falseBeqNat (S _)  Z      _   = Refl
+--falseBeqNat (S n') (S m') prf = falseBeqNat n' m' (succInjective n' m' prf)
