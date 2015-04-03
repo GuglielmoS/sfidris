@@ -27,14 +27,18 @@ andAssoc (conj P (conj Q R)) = conj (conj P Q) R
 
 -- If And Only If
 
-syntax [P] "IFF" [Q] = (P -> Q) /\ (Q -> P)
+iffImplies : {P, Q : Type} -> ((P -> Q) /\ (Q -> P)) -> P -> Q
+iffImplies (conj l r) p = (l p)
 
---iffImplies : {P, Q : Type} -> ((P -> Q) /\ (Q -> P)) -> P -> Q
---iffImplies x x1 = ?iffImplies_rhs
+iffRefl : {P : Type} -> ((P -> P) /\ (P -> P))
+iffRefl = conj id id 
 
---iffRefl : {P : Type} -> P IFF P
+iffSym : {P, Q : Type} -> ((P -> Q) /\ (Q -> P)) -> ((Q -> P) /\ (P -> Q))
+iffSym (conj pq qp) = conj qp pq
 
--- TODO
+iffTrans : {P, Q, R : Type} -> ((P -> Q) /\ (Q -> P)) -> ((Q -> R) /\ (R -> Q)) ->
+                               ((P -> R) /\ (R -> P))
+iffTrans (conj pq qp) (conj qr rq) = conj (qr . pq) (qp . rq)
 
 -- Disjuction
 
@@ -74,22 +78,23 @@ orbFalseElim True True prf = conj prf prf
 exFalsoQuodlibet : {P : Type} -> Void -> P
 exFalsoQuodlibet = void
 
-syntax "neg" [P] = P -> Void 
-
-notFalse : neg Void
+notFalse : Void -> Void
 notFalse false = false
 
-contradictionImpliesAnything : (P, Q : Type) -> (P /\ (neg P)) -> Q
+contradictionImpliesAnything : (P, Q : Type) -> (P /\ (P -> Void)) -> Q
 contradictionImpliesAnything P Q (conj p notP) = exFalsoQuodlibet (notP p)
 
 -- Inequality
 
-notFalseThenTrue : (b : Bool) -> (neg (b = False)) -> b = True 
+notFalseThenTrue : (b : Bool) -> (b = False -> Void) -> b = True 
 notFalseThenTrue False prf = exFalsoQuodlibet (prf Refl)
 notFalseThenTrue True _ = Refl
 
-falseBeqNat : (n, m : Nat) -> (neg (n = m)) -> beqNat n m = False
+succInjectiveNEQ : (n, m : Nat) -> (S n = S m -> Void) -> (n = m -> Void)
+succInjectiveNEQ n m snNEQsm nNEQm = snNEQsm (cong nNEQm)
+
+falseBeqNat : (n, m : Nat) -> (n = m -> Void) -> beqNat n m = False
 falseBeqNat Z      Z      prf = exFalsoQuodlibet (prf Refl)
 falseBeqNat Z      (S _)  _   = Refl
 falseBeqNat (S _)  Z      _   = Refl
---falseBeqNat (S n') (S m') prf = falseBeqNat n' m' (succInjective n' m' prf)
+falseBeqNat (S n') (S m') prf = falseBeqNat n' m' (succInjectiveNEQ n' m' prf)
