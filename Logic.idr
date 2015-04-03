@@ -6,7 +6,7 @@ import Induction
 -- Conjunction
 
 data And : Type -> Type -> Type where
-  conj : {P,Q : Type} -> P -> Q -> And P Q
+  conj : {P, Q : Type} -> P -> Q -> And P Q
 
 syntax [P] "/\\" [Q] = And P Q
 
@@ -27,17 +27,21 @@ andAssoc (conj P (conj Q R)) = conj (conj P Q) R
 
 -- If And Only If
 
-iffImplies : {P, Q : Type} -> ((P -> Q) /\ (Q -> P)) -> P -> Q
-iffImplies (conj l r) p = (l p)
+iff : Type -> Type -> Type
+iff p q = (p -> q) /\ (q -> p)
 
-iffRefl : {P : Type} -> ((P -> P) /\ (P -> P))
+syntax [p] "<->" [q] = iff p q
+
+iffImplies : {P, Q : Type} -> (P <-> Q) -> P -> Q
+iffImplies (conj pit itp) p = pit p
+
+iffRefl : {P : Type} -> P <-> P
 iffRefl = conj id id 
 
-iffSym : {P, Q : Type} -> ((P -> Q) /\ (Q -> P)) -> ((Q -> P) /\ (P -> Q))
-iffSym (conj pq qp) = conj qp pq
+iffSym : {P, Q : Type} -> (P <-> Q) -> (Q <-> P)
+iffSym (conj pq qp) = conj qp pq 
 
-iffTrans : {P, Q, R : Type} -> ((P -> Q) /\ (Q -> P)) -> ((Q -> R) /\ (R -> Q)) ->
-                               ((P -> R) /\ (R -> P))
+iffTrans : {P, Q, R : Type} -> (P <-> Q) -> (Q <-> R) -> (P <-> R)
 iffTrans (conj pq qp) (conj qr rq) = conj (qr . pq) (qp . rq)
 
 -- Disjuction
@@ -75,25 +79,28 @@ orbFalseElim True True prf = conj prf prf
 
 -- Falsehood
 
+neg : Type -> Type
+neg p = p -> Void
+
 exFalsoQuodlibet : {P : Type} -> Void -> P
 exFalsoQuodlibet = void
 
-notFalse : Void -> Void
+notFalse : neg Void
 notFalse false = false
 
-contradictionImpliesAnything : (P, Q : Type) -> (P /\ (P -> Void)) -> Q
+contradictionImpliesAnything : (P, Q : Type) -> (P /\ (neg P)) -> Q
 contradictionImpliesAnything P Q (conj p notP) = exFalsoQuodlibet (notP p)
 
 -- Inequality
 
-notFalseThenTrue : (b : Bool) -> (b = False -> Void) -> b = True 
+notFalseThenTrue : (b : Bool) -> (neg (b = False)) -> b = True 
 notFalseThenTrue False prf = exFalsoQuodlibet (prf Refl)
 notFalseThenTrue True _ = Refl
 
-succInjectiveNEQ : (n, m : Nat) -> (S n = S m -> Void) -> (n = m -> Void)
+succInjectiveNEQ : (n, m : Nat) -> (neg (S n = S m)) -> (neg (n = m))
 succInjectiveNEQ n m snNEQsm nNEQm = snNEQsm (cong nNEQm)
 
-falseBeqNat : (n, m : Nat) -> (n = m -> Void) -> beqNat n m = False
+falseBeqNat : (n, m : Nat) -> (neg (n = m)) -> beqNat n m = False
 falseBeqNat Z      Z      prf = exFalsoQuodlibet (prf Refl)
 falseBeqNat Z      (S _)  _   = Refl
 falseBeqNat (S _)  Z      _   = Refl
