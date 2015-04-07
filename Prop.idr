@@ -8,7 +8,7 @@ even n = (evenb n = True)
 
 data Ev : Nat -> Type where
   ev_0  : Ev 0
-  ev_SS : {n : Nat} -> Ev n -> Ev (S (S n))
+  ev_SS : Ev n -> Ev (S (S n))
 
 double : Nat -> Nat
 double n = n + n
