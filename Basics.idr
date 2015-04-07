@@ -89,17 +89,18 @@ andb3OkWithTFT = Refl
 andb3OkWithTTF : andb3 True True False = False
 andb3OkWithTTF = Refl
 
-namespace Playground1
+namespace Playground1 {
   data Nat' : Type where
-    O : Nat'         -- zero
+    O  : Nat'          -- zero
     S' : Nat' -> Nat'  -- successor
 
 -- alterntively
--- data Nat' = O | S Nat' 
+-- data Nat' = O | S' Nat'
 
   pred : Nat' -> Nat'
   pred O = O
   pred (S' x) = x
+}
 
 minusTwo : Nat -> Nat
 minusTwo Z = Z
@@ -120,7 +121,7 @@ testZddb1 = Refl
 testZddb2 : oddb (S (S (S (S Z)))) = False
 testZddb2 = Refl
 
-namespace Playground2
+namespace Playground2 {
   plus' : Nat -> Nat -> Nat
   plus' Z     m = m
   plus' (S n) m = S (plus' n m)
@@ -136,13 +137,13 @@ namespace Playground2
   minus' Z _ = Z
   minus' n@(S _) Z = n
   minus' (S n) (S m) = minus' n m
-
+}
 
 exp : Nat -> Nat -> Nat
 exp base Z = S Z
 exp base (S p) = mult base (exp base p)
 
--- Exercise FACTZRIAL
+-- Exercise FACTORIAL
 
 factorial : Nat -> Nat
 factorial Z = S Z
@@ -254,16 +255,6 @@ negationFnAppliedTwice :
 negationFnAppliedTwice f fxIsNegbx b = rewrite fxIsNegbx b in 
                                        rewrite fxIsNegbx (negb b) in 
                                        negbInvolutive b 
-
--- Exercise End
-
--- Exercise ANDB_EQ_ZRB
-
---andbEQorb : (b : Bool) -> (c : Bool) -> andb b c = orb b c -> b = c
---andbEQorb False False _ = Refl
---andbEQorb False True contra = contra
---andbEQorb True False contra = ?todo
---andbEQorb True True _ = Refl
 
 -- Exercise End
 
