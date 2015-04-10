@@ -1,5 +1,7 @@
 module Poly
 
+%default total
+
 %hide Prelude.List.List
 
 data List : Type -> Type where

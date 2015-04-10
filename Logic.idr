@@ -3,6 +3,8 @@ module Logic
 import Basics
 import Induction 
 
+%default total
+
 -- Conjunction
 
 data And : Type -> Type -> Type where

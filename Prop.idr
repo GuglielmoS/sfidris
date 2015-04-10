@@ -3,6 +3,8 @@ module Prop
 import Basics
 import Logic
 
+%default total
+
 even : Nat -> Type
 even n = (evenb n = True)
 

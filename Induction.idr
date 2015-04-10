@@ -2,6 +2,8 @@ module Induction
 
 import Basics
 
+%default total
+
 andbTrueElim1 : (b : Bool) -> (c : Bool) -> andb b c = True -> b = True
 andbTrueElim1 True c andbIsTrue = Refl
 andbTrueElim1 False c andbIsTrue = andbIsTrue

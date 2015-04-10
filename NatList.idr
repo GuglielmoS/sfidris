@@ -3,6 +3,8 @@ module NatList
 import Basics
 import Induction
 
+%default total
+
 data NatProd : Type where
   pair : Nat -> Nat -> NatProd
 

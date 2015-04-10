@@ -1,5 +1,7 @@
 module Basics
 
+%default total
+
 data Day = Monday
          | Tuesday
          | Wednesday
