@@ -190,14 +190,20 @@ optimizedMult e1 e2 = AMult e1 e2
 constantFolding : AExp -> AExp
 constantFolding (ANum k) = ANum k
 constantFolding (AId x) = AId x
-constantFolding (APlus e1 e2) = optimizedPlus e1 e2 
-constantFolding (AMinus e1 e2) = optimizedMinus e1 e2
-constantFolding (AMult e1 e2) = optimizedMult e1 e2
+constantFolding (APlus e1 e2) = optimizedPlus (constantFolding e1) (constantFolding e2) 
+constantFolding (AMinus e1 e2) = optimizedMinus (constantFolding e1) (constantFolding e2)
+constantFolding (AMult e1 e2) = optimizedMult (constantFolding e1) (constantFolding e2)
 
 partial
 constantFoldingIsCorrect : aeval st a = aeval st (constantFolding a)
 constantFoldingIsCorrect {st = st} {a = (ANum k)} = Refl
 constantFoldingIsCorrect {st = st} {a = (AId k)} = Refl
-constantFoldingIsCorrect {st = st} {a = (APlus a1 a2)} = optimizedPlusIsCorrect
+-- plus
+constantFoldingIsCorrect {st = st} {a = (APlus a1 a2)} =
+  rewrite constantFoldingIsCorrect {st} {a=a1} in
+  rewrite constantFoldingIsCorrect {st} {a=a2} in
+  optimizedPlusIsCorrect {a1=constantFolding a1} {a2=constantFolding a2}
+-- minus
 constantFoldingIsCorrect {st = st} {a = (AMinus x y)} = ?constantFoldingIsCorrect_rhs_4
+-- mult
 constantFoldingIsCorrect {st = st} {a = (AMult x y)} = ?constantFoldingIsCorrect_rhs_5
