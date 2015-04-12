@@ -63,3 +63,26 @@ symCequiv equiv = conj (symEquivLeft equiv) (symCequivRight equiv)
 
 transCequiv : cequiv {st} {st'} c1 c2 -> cequiv {st} {st'} c2 c3 -> cequiv {st} {st'} c1 c3
 transCequiv c1EQUIVc2 c2EQUIVc3 = iffTrans c1EQUIVc2 c2EQUIVc3
+
+-- Behavioral Equivalence is a Congruence
+
+CAssCongLeft : aequiv {st} a1 a1' -> ceval (CAss i a1) st st' -> ceval (CAss i a1') st st'
+CAssCongLeft {st} aEQUIVa' (E_Ass prf) = ?CAssCongLeftProof 
+Equiv.CAssCongLeftProof = proof
+  intros
+  rewrite prf
+  refine E_Ass
+  rewrite aEQUIVa'
+  trivial
+
+CAssCongRight : aequiv {st} a1 a1' -> ceval (CAss i a1') st st' -> ceval (CAss i a1) st st'
+CAssCongRight {st} aEQUIVa' (E_Ass prf) = ?CAssCongRightProof
+Equiv.CAssCongRightProof = proof
+  intros
+  rewrite prf
+  refine E_Ass
+  rewrite sym aEQUIVa'
+  trivial
+
+CAssCong : aequiv {st} a1 a1' -> cequiv {st} {st'} (CAss i a1) (CAss i a1') 
+CAssCong {st} {st'} {a1} {a1'} x = conj (CAssCongLeft x) (CAssCongRight x)
