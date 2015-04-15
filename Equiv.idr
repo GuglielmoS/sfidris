@@ -64,7 +64,11 @@ symCequiv equiv = conj (symEquivLeft equiv) (symCequivRight equiv)
 transCequiv : cequiv {st} {st'} c1 c2 -> cequiv {st} {st'} c2 c3 -> cequiv {st} {st'} c1 c3
 transCequiv c1EQUIVc2 c2EQUIVc3 = iffTrans c1EQUIVc2 c2EQUIVc3
 
+--
 -- Behavioral Equivalence is a Congruence
+--
+
+-- Assignment is a congruenge
 
 CAssCongLeft : aequiv {st} a1 a1' -> ceval (CAss i a1) st st' -> ceval (CAss i a1') st st'
 CAssCongLeft {st} aEQUIVa' (E_Ass prf) = ?CAssCongLeftProof 
