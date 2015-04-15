@@ -33,6 +33,7 @@ data BExp : Type where
   BNot : BExp -> BExp
   BAnd : BExp -> BExp -> BExp
 
+%elim
 data Com : Type where
   CSkip : Com
   CAss : Id -> AExp -> Com
@@ -127,3 +128,113 @@ optimizeZeroPlusSound {st} {a = (AMinus e1 e2)} =
 optimizeZeroPlusSound {st} {a = (AMult e1 e2)} =
   rewrite optimizeZeroPlusSound {st} {a=e1} in
   rewrite optimizeZeroPlusSound {st} {a=e2} in Refl
+
+--
+-- Determinism of evaluation
+--
+
+cevalDeterministic : ceval c st st1 -> ceval c st st2 -> st1 = st2
+cevalDeterministic E_SKip E_SKip = Refl
+-- assignment
+cevalDeterministic (E_Ass prf) (E_Ass prf1) = ?assignProof
+-- sequence
+cevalDeterministic (E_Seq _ c2) (E_Seq _ c2') = ?seqProof
+-- if
+cevalDeterministic (E_IfTrue _ x) (E_IfTrue _ z) = cevalDeterministic x z
+cevalDeterministic (E_IfTrue prf bodyEval) (E_IfFalse prf' bodyEval') = ?ifContraProof_1
+cevalDeterministic (E_IfFalse _ x) (E_IfFalse _ z) = cevalDeterministic x z
+cevalDeterministic (E_IfFalse prf x) (E_IfTrue y z) = ?ifContraProof_2
+-- while
+cevalDeterministic (E_WhileEnd _) (E_WhileEnd _) = Refl
+cevalDeterministic (E_WhileLoop prf x y) (E_WhileLoop z w s) = ?whileLoopProof
+cevalDeterministic (E_WhileEnd prf) (E_WhileLoop x y z) = ?whileContraProof_1
+cevalDeterministic (E_WhileLoop prf x y) (E_WhileEnd z) = ?whileContraProof_2
+
+-- Proofs
+
+Imp.assignProof = proof
+  intro st
+  intro a1
+  intro n
+  intro a1Eval
+  intro n'
+  rewrite sym a1Eval
+  intro nEQn'
+  intro x
+  rewrite nEQn'
+  trivial
+
+Imp.seqProof = proof
+  intro st1
+  intro st'
+  intro c2
+  intro c2Eval
+  intro st2
+  intro st'1
+  intro c2Eval''
+  intro st
+  intro c1
+  intro c1Eval
+  intro c1Eval'
+  let st'EQst'1 = cevalDeterministic c1Eval c1Eval'
+  let c2Eval' = replace st'EQst'1 {P = \s => ceval c2 s st1} c2Eval
+  exact cevalDeterministic c2Eval' c2Eval''
+
+Imp.ifContraProof_1 = proof
+  intro st
+  intro b
+  intro prf
+  intro st1
+  intro c1
+  intro bodyEval
+  rewrite sym prf
+  exact (void . trueNotFalse)
+
+Imp.ifContraProof_2 = proof
+  intro st
+  intro b
+  intro prf
+  intro st1
+  intro c2
+  intro bodyEval
+  rewrite sym prf
+  intro contra
+  exact void $ trueNotFalse (sym contra)
+
+Imp.whileLoopProof = proof
+  intro st
+  intro b
+  intro prf
+  intro c
+  intro st'
+  intro cEval
+  intro st1
+  intro whileEval
+  intro prf'
+  intro st'1
+  intro cEval'
+  intro st2
+  let stEQst'1 = cevalDeterministic cEval cEval'
+  rewrite stEQst'1
+  intro whileEval'
+  exact cevalDeterministic whileEval whileEval'
+
+Imp.whileContraProof_1 = proof
+  intro st
+  intro b
+  intro bIsFalse
+  rewrite sym bIsFalse
+  intro contra
+  exact void $ trueNotFalse (sym contra)
+
+Imp.whileContraProof_2 = proof
+  intro st
+  intro b
+  intro bIsTrue
+  intro c
+  intro st'
+  intro bodyEval
+  intro st1
+  intro whileEval
+  rewrite sym bIsTrue
+  exact void . trueNotFalse
