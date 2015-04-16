@@ -45,14 +45,27 @@ iffTrans (conj pq qp) (conj qr rq) = conj (qr . pq) (qp . rq)
 
 -- Disjuction
 
-infixl 8 \/
+infixl 7 \/
 data (\/) : Type -> Type -> Type where
   orIntroL : {P, Q : Type} -> P -> P \/ Q
   orIntroR : {P, Q : Type} -> Q -> P \/ Q
 
-orCommute : {P, Q : Type} -> (P \/ Q) -> (Q \/ P)
+orCommute : {P, Q : Type} -> P \/ Q -> Q \/ P
 orCommute (orIntroL P) = orIntroR P
 orCommute (orIntroR Q) = orIntroL Q
+
+orDistributesOverAnd1 : {P, Q, R : Type} -> P \/ (Q /\ R) -> (P \/ Q) /\ (P \/ R)
+orDistributesOverAnd1 (orIntroL p) = conj (orIntroL p) (orIntroL p)
+orDistributesOverAnd1 (orIntroR (conj q r)) = conj (orIntroR q) (orIntroR r)
+
+orDistributesOverAnd2 : {P, Q, R : Type} -> (P \/ Q) /\ (P \/ R) ->  P \/ (Q /\ R)
+orDistributesOverAnd2 (conj (orIntroL _) (orIntroL p)) = orIntroL p
+orDistributesOverAnd2 (conj (orIntroL p) (orIntroR _)) = orIntroL p
+orDistributesOverAnd2 (conj (orIntroR _) (orIntroL p)) = orIntroL p
+orDistributesOverAnd2 (conj (orIntroR q) (orIntroR r)) = orIntroR (conj q r)
+
+orDistributesOverAnd : {P, Q, R : Type} -> P \/ (Q /\ R) <-> (P \/ Q) /\ (P \/ R) 
+orDistributesOverAnd = conj orDistributesOverAnd1 orDistributesOverAnd2
 
 andbProp : (b, c : Bool) -> andb b c = True -> (b = True) /\ (c = True)
 andbProp False False prf = conj prf prf
@@ -75,7 +88,7 @@ orbFalseElim False c prf = conj Refl prf
 orbFalseElim True False prf = conj prf Refl
 orbFalseElim True True prf = conj prf prf
 
--- Falsehood
+-- Falsehood & Negation
 
 neg : Type -> Type
 neg p = p -> Void
@@ -88,6 +101,9 @@ notFalse false = false
 
 contradictionImpliesAnything : (P, Q : Type) -> (P /\ (neg P)) -> Q
 contradictionImpliesAnything P Q (conj p notP) = exFalsoQuodlibet (notP p)
+
+doubleNeg : {P : Type} -> (P -> neg (neg P))
+doubleNeg p notP = notP p
 
 -- Inequality
 
