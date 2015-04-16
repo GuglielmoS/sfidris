@@ -7,32 +7,29 @@ import Induction
 
 -- Conjunction
 
-data And : Type -> Type -> Type where
-  conj : {P, Q : Type} -> P -> Q -> And P Q
+infixl 8 /\
+data (/\) : Type -> Type -> Type where
+  conj : {P, Q : Type} -> P -> Q -> P /\ Q
 
-syntax [P] "/\\" [Q] = And P Q
-
-andExample : And (0 = 0) (4 = 2 * 2)
+andExample : (0 = 0) /\ (4 = 2 * 2)
 andExample = conj Refl Refl 
 
-proj1 : {P, Q : Type} -> (P /\ Q) -> P
+proj1 : {P, Q : Type} -> P /\ Q -> P
 proj1 (conj P Q) = P
 
-proj2 : {P, Q : Type} -> (P /\ Q) -> Q
+proj2 : {P, Q : Type} -> P /\ Q -> Q
 proj2 (conj P Q) = Q
 
-andCommute : {P, Q : Type} -> (P /\ Q) -> (Q /\ P)
+andCommute : {P, Q : Type} -> P /\ Q -> Q /\ P
 andCommute (conj P Q) = conj Q P
 
-andAssoc : {P, Q, R : Type} -> (P /\ (Q /\ R)) -> (P /\ Q) /\ R 
+andAssoc : {P, Q, R : Type} -> P /\ (Q /\ R) -> (P /\ Q) /\ R 
 andAssoc (conj P (conj Q R)) = conj (conj P Q) R
 
 -- If And Only If
 
-iff : Type -> Type -> Type
-iff p q = (p -> q) /\ (q -> p)
-
-syntax [p] "<->" [q] = iff p q
+(<->) : Type -> Type -> Type
+(<->) p q = (p -> q) /\ (q -> p)
 
 iffImplies : {P, Q : Type} -> (P <-> Q) -> P -> Q
 iffImplies (conj pit itp) p = pit p
@@ -48,11 +45,10 @@ iffTrans (conj pq qp) (conj qr rq) = conj (qr . pq) (qp . rq)
 
 -- Disjuction
 
-data Or : Type -> Type -> Type where
-  orIntroL : {P, Q : Type} -> P -> Or P Q
-  orIntroR : {P, Q : Type} -> Q -> Or P Q
-
-syntax [P] "\\/" [Q] = Or P Q
+infixl 8 \/
+data (\/) : Type -> Type -> Type where
+  orIntroL : {P, Q : Type} -> P -> P \/ Q
+  orIntroR : {P, Q : Type} -> Q -> P \/ Q
 
 orCommute : {P, Q : Type} -> (P \/ Q) -> (Q \/ P)
 orCommute (orIntroL P) = orIntroR P
