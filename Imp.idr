@@ -68,33 +68,49 @@ data ceval : Com -> State -> State -> Type where
                 -> ceval (CWhile b c) st' st''
                 -> ceval (CWhile b c) st st''
 
-{- Evaluation as a relation (without variables, thus without state)
-data AEvalR : AExp -> Nat -> Type where
-  E_ANum : AEvalR (ANum n) n
-  E_APlus : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (APlus e1 e2) (n1 + n2)
-  E_AMinus : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMinus e1 e2) (n1 - n2)
-  E_AMult : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMult e1 e2) (n1 * n2)
+--
+-- Evaluation as a relation (without variables, thus without state)
+--
 
-aeval_iff_AEvalR_left : AEvalR a n -> aeval st a = n
-aeval_iff_AEvalR_left E_ANum = Refl
-aeval_iff_AEvalR_left {st} (E_APlus x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                           rewrite aeval_iff_AEvalR_left {st} y in Refl
-aeval_iff_AEvalR_left {st} (E_AMinus x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                            rewrite aeval_iff_AEvalR_left {st} y in Refl
-aeval_iff_AEvalR_left {st} (E_AMult x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                           rewrite aeval_iff_AEvalR_left {st} y in Refl
+namespace EvalAsRelation {
+  data AExp' : Type where
+    ANum' : Nat -> AExp'
+    APlus' : AExp' -> AExp' -> AExp'
+    AMinus' : AExp' -> AExp' -> AExp'
+    AMult' : AExp' -> AExp' -> AExp'
 
-aeval_iff_AEvalR_right : (aeval st a = n) -> AEvalR a n
-aeval_iff_AEvalR_right prf {a = (ANum k)} = rewrite sym prf in E_ANum
-aeval_iff_AEvalR_right prf {a = (APlus x y)} = rewrite sym prf in 
-                                               (E_APlus (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl))
-aeval_iff_AEvalR_right prf {a = (AMinus x y)} = rewrite sym prf in
-                                                E_AMinus (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
-aeval_iff_AEvalR_right prf {a = (AMult x y)} = rewrite sym prf in 
-                                               E_AMult (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
-aeval_iff_AEvalR : (AEvalR a n) <-> (aeval st a = n)
-aeval_iff_AEvalR = conj aeval_iff_AEvalR_left aeval_iff_AEvalR_right
--}
+  aeval' : State -> AExp' -> Nat
+  aeval' st (ANum' n) = n
+  aeval' st (APlus' a1 a2) = aeval' st a1 + aeval' st a2
+  aeval' st (AMinus' a1 a2) = aeval' st a1 - aeval' st a2
+  aeval' st (AMult' a1 a2) = aeval' st a1 * aeval' st a2
+
+  data AEvalR : AExp' -> Nat -> Type where
+    E_ANum' : AEvalR (ANum' n) n
+    E_APlus' : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (APlus' e1 e2) (n1 + n2)
+    E_AMinus' : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMinus' e1 e2) (n1 - n2)
+    E_AMult' : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMult' e1 e2) (n1 * n2)
+
+  aeval_iff_AEvalR_left : AEvalR a n -> aeval' st a = n
+  aeval_iff_AEvalR_left E_ANum' = Refl
+  aeval_iff_AEvalR_left {st} (E_APlus' x y) = rewrite aeval_iff_AEvalR_left {st} x in
+                                             rewrite aeval_iff_AEvalR_left {st} y in Refl
+  aeval_iff_AEvalR_left {st} (E_AMinus' x y) = rewrite aeval_iff_AEvalR_left {st} x in
+                                              rewrite aeval_iff_AEvalR_left {st} y in Refl
+  aeval_iff_AEvalR_left {st} (E_AMult' x y) = rewrite aeval_iff_AEvalR_left {st} x in
+                                             rewrite aeval_iff_AEvalR_left {st} y in Refl
+
+  aeval_iff_AEvalR_right : (aeval' st a = n) -> AEvalR a n
+  aeval_iff_AEvalR_right prf {a = (ANum' k)} = rewrite sym prf in E_ANum'
+  aeval_iff_AEvalR_right prf {a = (APlus' x y)} = rewrite sym prf in 
+                                                 (E_APlus' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl))
+  aeval_iff_AEvalR_right prf {a = (AMinus' x y)} = rewrite sym prf in
+                                                  E_AMinus' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
+  aeval_iff_AEvalR_right prf {a = (AMult' x y)} = rewrite sym prf in 
+                                                 E_AMult' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
+  aeval_iff_AEvalR : (AEvalR a n) <-> (aeval' st a = n)
+  aeval_iff_AEvalR = conj aeval_iff_AEvalR_left aeval_iff_AEvalR_right
+}
 
 -- Trivial constant folding
 optimizeZeroPlus : AExp -> AExp
