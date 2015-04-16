@@ -57,8 +57,6 @@ orbOkWithTF = Refl
 orbOkWithTT : orb True True = True
 orbOkWithTT = Refl
 
--- Exercise NANDB
-
 nandb : Bool -> Bool -> Bool
 nandb b1 b2 = negb $ andb b1 b2
 
@@ -73,8 +71,6 @@ nandbOkWithTF = Refl
 
 nandbOkWithTT : nandb True True = False
 nandbOkWithTT = Refl
-
--- Exercise ANDB3
 
 andb3 : Bool -> Bool -> Bool -> Bool
 andb3 b1 b2 b3 = andb (andb b1 b2) b3
@@ -145,8 +141,6 @@ exp : Nat -> Nat -> Nat
 exp base Z = S Z
 exp base (S p) = mult base (exp base p)
 
--- Exercise FACTORIAL
-
 factorial : Nat -> Nat
 factorial Z = S Z
 factorial n@(S n') = mult n (factorial n')
@@ -162,8 +156,6 @@ twelve = plus ten (S (S Z))
 
 testFactorial2 : factorial (S (S (S (S (S Z))))) = mult ten twelve 
 testFactorial2 = Refl
-
--- Exercise End
 
 beqNat : Nat -> Nat -> Bool
 beqNat Z Z = True
@@ -185,8 +177,6 @@ testBleNat2 = Refl
 testBleNat3 : bleNat (S (S (S (S Z)))) (S (S Z)) = False
 testBleNat3 = Refl
 
--- Exercise BLT_NAT
-
 bltNat : Nat -> Nat -> Bool
 bltNat n m = andb (bleNat n m) (negb $ beqNat n m)
 
@@ -198,8 +188,6 @@ testBltNat2 = Refl
 
 testBltNat3 : bltNat (S (S (S (S Z)))) (S (S Z)) = False
 testBltNat3 = Refl
-
--- End Exercise
 
 plusZeroLeft : plus Z n = n
 plusZeroLeft = Refl
@@ -213,22 +201,14 @@ multZeroLeft = Refl
 plusIdExample : n = m -> n + m = m + m
 plusIdExample nEQm = rewrite nEQm in Refl 
 
--- Exercise PLUSID
-
 plusIdExercise : n = m -> m = o -> n + m = m + o
 plusIdExercise nEQm mEQo = rewrite nEQm in rewrite mEQo in Refl
-
--- Exercise End
 
 multZeroPlus : mult (plus Z n) m = mult n m
 multZeroPlus = Refl
 
--- Exercise MUTL_S_1
-
 multSuccZne : m = S n -> mult m (plus (S Z) n) = mult m m
 multSuccZne mEQSN = rewrite mEQSN in Refl
-
--- Exercise End
 
 plusZneNeqZero : (n : Nat) -> beqNat (plus n (S Z)) Z = False
 plusZneNeqZero Z = Refl
@@ -238,15 +218,9 @@ negbInvolutive : (b : Bool) -> negb (negb b) = b
 negbInvolutive True = Refl
 negbInvolutive False = Refl
 
--- Exercise Zero_nbeq_PlusZne
-
 zeroNbeqPlusZne : (n : Nat) -> beqNat Z (plus n (S Z)) = False
 zeroNbeqPlusZne Z = Refl
 zeroNbeqPlusZne (S _) = Refl
-
--- Exercise End
-
--- Exercise BooleanFunctions
 
 identityFnAppliedTwice : 
   (f : Bool -> Bool) -> ((x : Bool) -> f x = x) -> ((b : Bool) -> f (f b) = b)
@@ -257,10 +231,6 @@ negationFnAppliedTwice :
 negationFnAppliedTwice f fxIsNegbx b = rewrite fxIsNegbx b in 
                                        rewrite fxIsNegbx (negb b) in 
                                        negbInvolutive b 
-
--- Exercise End
-
--- Exercise BINARY
 
 data Bin : Type where
   Zero : Bin
@@ -285,8 +255,3 @@ testBinIncr2 = Refl
 
 testBinIncr3 : binToNat (incr $ OneMoreThanTwice Zero) = S (S Z)
 testBinIncr3 = Refl
-
---testBinIncr4 : (n : Bin) -> binToNat (incr n) = plus (S Z) (binToNat n)
---testBinIncr4 Zero = Refl
---testBinIncr4 (TwiceBin x) = Refl
---testBinIncr4 (OneMoreThanTwice x) = ?testBinIncr4_rhs_4

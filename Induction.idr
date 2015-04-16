@@ -8,21 +8,15 @@ andbTrueElim1 : (b : Bool) -> (c : Bool) -> andb b c = True -> b = True
 andbTrueElim1 True c andbIsTrue = Refl
 andbTrueElim1 False c andbIsTrue = andbIsTrue
 
--- Exercise AndbTrueElim2
-
 andbTrueElim2 : (b : Bool) -> (c : Bool) -> andb b c = True -> c = True
 andbTrueElim2 True True   _ = Refl
 andbTrueElim2 True False  contra = contra
 andbTrueElim2 False True  _ = Refl
 andbTrueElim2 False False contra = contra
 
--- Exercise End
-
 plusZeroRight : (n : Nat) -> n + 0 = n
 plusZeroRight Z = Refl
 plusZeroRight (S k) = cong (plusZeroRight k)
-
--- Exercise BASIC_INDUCTION
 
 multZeroRight : (n : Nat) -> n * 0 = 0
 multZeroRight Z = Refl
@@ -48,10 +42,6 @@ plusAssoc (S k) (S i) (S j) = rewrite sym $ plusN_Sm i j in
                               rewrite sym $ plusN_Sm (plus k i) j in
                               cong {f=S} $ cong {f=S} $ cong {f=S} $ plusAssoc k i j
 
--- Exercise End
-
--- Exercise Double_Plus
-
 double : Nat -> Nat
 double Z = 0
 double (S k) = S (S (double k)) 
@@ -60,10 +50,6 @@ doublePlus : (n : Nat) -> double n = n + n
 doublePlus Z = Refl
 doublePlus (S k) = rewrite sym $ plusN_Sm k k in 
                            cong {f=S} $ cong {f=S} $ doublePlus k 
-
--- Exercise End
-
--- More Exercises
 
 bleNatRefl : (n : Nat) -> True = bleNat n n
 bleNatRefl Z = Refl
@@ -91,12 +77,6 @@ all3Spec False c = Refl
 all3Spec True False = Refl
 all3Spec True True = Refl
 
--- Exercises End
-
--- Exercise BeqNatRefl
-
 beqNatRefl : (n : Nat) -> True = beqNat n n
 beqNatRefl Z = Refl
 beqNatRefl (S k) = beqNatRefl k 
-
--- Exercise End
