@@ -133,6 +133,7 @@ optimizeZeroPlusSound {st} {a = (AMult e1 e2)} =
 -- Determinism of evaluation
 --
 
+partial
 cevalDeterministic : ceval c st st1 -> ceval c st st2 -> st1 = st2
 cevalDeterministic E_SKip E_SKip = Refl
 -- assignment
