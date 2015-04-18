@@ -155,7 +155,7 @@ cevalDeterministic E_SKip E_SKip = Refl
 -- assignment
 cevalDeterministic (E_Ass prf) (E_Ass prf1) = ?assignProof
 -- sequence
-cevalDeterministic (E_Seq _ c2) (E_Seq _ c2') = ?seqProof
+cevalDeterministic (E_Seq c1 c2) (E_Seq c1' c2') = ?seqProof
 -- if
 cevalDeterministic (E_IfTrue _ x) (E_IfTrue _ z) = cevalDeterministic x z
 cevalDeterministic (E_IfTrue prf bodyEval) (E_IfFalse prf' bodyEval') = ?ifContraProof_1
@@ -182,20 +182,18 @@ Imp.assignProof = proof
   trivial
 
 Imp.seqProof = proof
-  intro st1
-  intro st'
-  intro c2
-  intro c2Eval
-  intro st2
-  intro st'1
-  intro c2Eval''
   intro st
   intro c1
+  intro st'
   intro c1Eval
+  intro st1
+  intro c2
+  intro c2Eval
+  intro st'1
   intro c1Eval'
-  let st'EQst'1 = cevalDeterministic c1Eval c1Eval'
-  let c2Eval' = replace st'EQst'1 {P = \s => ceval c2 s st1} c2Eval
-  exact cevalDeterministic c2Eval' c2Eval''
+  rewrite cevalDeterministic c1Eval c1Eval'
+  intro st2
+  exact cevalDeterministic c2Eval
 
 Imp.ifContraProof_1 = proof
   intro st
@@ -205,7 +203,7 @@ Imp.ifContraProof_1 = proof
   intro c1
   intro bodyEval
   rewrite sym prf
-  exact (void . trueNotFalse)
+  exact void . trueNotFalse
 
 Imp.ifContraProof_2 = proof
   intro st
@@ -215,8 +213,7 @@ Imp.ifContraProof_2 = proof
   intro c2
   intro bodyEval
   rewrite sym prf
-  intro contra
-  exact void $ trueNotFalse (sym contra)
+  exact void . trueNotFalse . sym
 
 Imp.whileLoopProof = proof
   intro st
@@ -231,18 +228,15 @@ Imp.whileLoopProof = proof
   intro st'1
   intro cEval'
   intro st2
-  let stEQst'1 = cevalDeterministic cEval cEval'
-  rewrite stEQst'1
-  intro whileEval'
-  exact cevalDeterministic whileEval whileEval'
+  rewrite cevalDeterministic cEval cEval'
+  exact cevalDeterministic whileEval
 
 Imp.whileContraProof_1 = proof
   intro st
   intro b
   intro bIsFalse
   rewrite sym bIsFalse
-  intro contra
-  exact void $ trueNotFalse (sym contra)
+  exact void . trueNotFalse . sym
 
 Imp.whileContraProof_2 = proof
   intro st
