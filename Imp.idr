@@ -79,11 +79,11 @@ namespace EvalAsRelation {
     AMinus' : AExp' -> AExp' -> AExp'
     AMult' : AExp' -> AExp' -> AExp'
 
-  aeval' : State -> AExp' -> Nat
-  aeval' st (ANum' n) = n
-  aeval' st (APlus' a1 a2) = aeval' st a1 + aeval' st a2
-  aeval' st (AMinus' a1 a2) = aeval' st a1 - aeval' st a2
-  aeval' st (AMult' a1 a2) = aeval' st a1 * aeval' st a2
+  aeval' : AExp' -> Nat
+  aeval' (ANum' n) = n
+  aeval' (APlus' a1 a2) = aeval' a1 + aeval' a2
+  aeval' (AMinus' a1 a2) = aeval' a1 - aeval' a2
+  aeval' (AMult' a1 a2) = aeval' a1 * aeval' a2
 
   data AEvalR : AExp' -> Nat -> Type where
     E_ANum' : AEvalR (ANum' n) n
@@ -91,16 +91,16 @@ namespace EvalAsRelation {
     E_AMinus' : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMinus' e1 e2) (n1 - n2)
     E_AMult' : AEvalR e1 n1 -> AEvalR e2 n2 -> AEvalR (AMult' e1 e2) (n1 * n2)
 
-  aeval_iff_AEvalR_left : AEvalR a n -> aeval' st a = n
+  aeval_iff_AEvalR_left : AEvalR a n -> aeval' a = n
   aeval_iff_AEvalR_left E_ANum' = Refl
-  aeval_iff_AEvalR_left {st} (E_APlus' x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                             rewrite aeval_iff_AEvalR_left {st} y in Refl
-  aeval_iff_AEvalR_left {st} (E_AMinus' x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                              rewrite aeval_iff_AEvalR_left {st} y in Refl
-  aeval_iff_AEvalR_left {st} (E_AMult' x y) = rewrite aeval_iff_AEvalR_left {st} x in
-                                             rewrite aeval_iff_AEvalR_left {st} y in Refl
+  aeval_iff_AEvalR_left (E_APlus' x y) = rewrite aeval_iff_AEvalR_left x in
+                                         rewrite aeval_iff_AEvalR_left y in Refl
+  aeval_iff_AEvalR_left (E_AMinus' x y) = rewrite aeval_iff_AEvalR_left  x in
+                                          rewrite aeval_iff_AEvalR_left y in Refl
+  aeval_iff_AEvalR_left (E_AMult' x y) = rewrite aeval_iff_AEvalR_left x in
+                                         rewrite aeval_iff_AEvalR_left y in Refl
 
-  aeval_iff_AEvalR_right : (aeval' st a = n) -> AEvalR a n
+  aeval_iff_AEvalR_right : (aeval' a = n) -> AEvalR a n
   aeval_iff_AEvalR_right prf {a = (ANum' k)} = rewrite sym prf in E_ANum'
   aeval_iff_AEvalR_right prf {a = (APlus' x y)} = rewrite sym prf in 
                                                  (E_APlus' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl))
@@ -108,7 +108,7 @@ namespace EvalAsRelation {
                                                   E_AMinus' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
   aeval_iff_AEvalR_right prf {a = (AMult' x y)} = rewrite sym prf in 
                                                  E_AMult' (aeval_iff_AEvalR_right Refl) (aeval_iff_AEvalR_right Refl)
-  aeval_iff_AEvalR : (AEvalR a n) <-> (aeval' st a = n)
+  aeval_iff_AEvalR : (AEvalR a n) <-> (aeval' a = n)
   aeval_iff_AEvalR = conj aeval_iff_AEvalR_left aeval_iff_AEvalR_right
 }
 
@@ -170,82 +170,39 @@ cevalDeterministic (E_WhileLoop prf x y) (E_WhileEnd z) = ?whileContraProof_2
 -- Proofs
 
 Imp.assignProof = proof
-  intro st
-  intro a1
-  intro n
-  intro a1Eval
-  intro n'
+  intro st, a1, n, a1Eval, n'
   rewrite sym a1Eval
-  intro nEQn'
-  intro x
+  intro nEQn', x
   rewrite nEQn'
   trivial
 
 Imp.seqProof = proof
-  intro st
-  intro c1
-  intro st'
-  intro c1Eval
-  intro st1
-  intro c2
-  intro c2Eval
-  intro st'1
-  intro c1Eval'
+  intro st, c1, st', c1Eval, st1, c2, c2Eval, st'1, c1Eval'
   rewrite cevalDeterministic c1Eval c1Eval'
   intro st2
   exact cevalDeterministic c2Eval
 
 Imp.ifContraProof_1 = proof
-  intro st
-  intro b
-  intro prf
-  intro st1
-  intro c1
-  intro bodyEval
+  intro st, b, prf, st1, c1, bodyEval
   rewrite sym prf
   exact void . trueNotFalse
 
 Imp.ifContraProof_2 = proof
-  intro st
-  intro b
-  intro prf
-  intro st1
-  intro c2
-  intro bodyEval
+  intro st, b, prf, st1, c2, bodyEval
   rewrite sym prf
   exact void . trueNotFalse . sym
 
 Imp.whileLoopProof = proof
-  intro st
-  intro b
-  intro prf
-  intro c
-  intro st'
-  intro cEval
-  intro st1
-  intro whileEval
-  intro prf'
-  intro st'1
-  intro cEval'
-  intro st2
+  intro st, b, prf, c, st', cEval, st1, whileEval, prf', st'1, cEval', st2
   rewrite cevalDeterministic cEval cEval'
   exact cevalDeterministic whileEval
 
 Imp.whileContraProof_1 = proof
-  intro st
-  intro b
-  intro bIsFalse
+  intro st, b, bIsFalse
   rewrite sym bIsFalse
   exact void . trueNotFalse . sym
 
 Imp.whileContraProof_2 = proof
-  intro st
-  intro b
-  intro bIsTrue
-  intro c
-  intro st'
-  intro bodyEval
-  intro st1
-  intro whileEval
+  intro st, b, bIsTrue, c, sst', bodyEval, st1, whileEval
   rewrite sym bIsTrue
   exact void . trueNotFalse
